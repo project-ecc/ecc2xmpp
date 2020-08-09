@@ -11,10 +11,20 @@ from datetime import datetime
 
 class xmppServer:
 
+	BUFFER_SIZE = 1024
+
 	def __init__(self, addr, port):
 
 		self.addr = addr
 		self.port = port
+
+	def handler(self, client_conn, client_addr):
+
+		logging.info('Connection from %s', client_addr)
+
+		data = client_conn.recv(self.BUFFER_SIZE)
+
+		logging.info(data)
 
 	def run(self):
 
@@ -22,9 +32,17 @@ class xmppServer:
 
 		s.bind((self.addr, self.port))
 
-		logging.info('Server bound to address %s port %d', self.addr, self.port)
+		logging.info('Server bound to %s:%d', self.addr, self.port)
 
 		s.listen(0) # don't allow unaccepted connections to be queued by the OS
+
+		while True:
+
+			(client_conn, client_addr) = s.accept()
+
+			self.handler(client_conn, client_addr)
+
+			#thread.start_new_thread(xmppHandler, (conn, addr))
 
 ################################################################################
 
