@@ -1,6 +1,7 @@
 import settings
 import argparse
 import logging
+import socket
 import signal
 import sys
 
@@ -10,13 +11,20 @@ from datetime import datetime
 
 class xmppServer:
 
-    def __init__(self, port):
+	def __init__(self, addr, port):
 
-        self.port = port
+		self.addr = addr
+		self.port = port
 
-    def run(self):
+	def run(self):
 
-    	pass
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+		s.bind((self.addr, self.port))
+
+		logging.info('Server bound to address %s port %d', self.addr, self.port)
+
+		s.listen(0) # don't allow unaccepted connections to be queued by the OS
 
 ################################################################################
 
@@ -45,13 +53,14 @@ def main():
 
 	argparser = argparse.ArgumentParser(description='XMPP Client Bridge for ECC Messaging')
 
-	argparser.add_argument('-p', '--port', action='store', help='port for client connections', type=int, default = 5222)
+	argparser.add_argument('-a', '--addr', action='store', help='address to accept connections', type=str, default = '127.0.0.1')
+	argparser.add_argument('-p', '--port', action='store', help='port for client connections'  , type=int, default = 5222)
 
 	command_line_args = argparser.parse_args()
 
 	logging.info('Arguments %s', vars(command_line_args))
 
-	server = xmppServer(command_line_args.port)
+	server = xmppServer(command_line_args.addr, command_line_args.port)
 
 	server.run()
 
