@@ -6,6 +6,17 @@ import sys
 
 from datetime import datetime
 
+################################################################################
+
+class xmppServer:
+
+    def __init__(self, port):
+
+        self.port = port
+
+    def run(self):
+
+    	pass
 
 ################################################################################
 
@@ -34,11 +45,15 @@ def main():
 
 	argparser = argparse.ArgumentParser(description='XMPP Client Bridge for ECC Messaging')
 
-	#argparser.add_argument()
+	argparser.add_argument('-p', '--port', action='store', help='port for client connections', type=int, default = 5222)
 
 	command_line_args = argparser.parse_args()
 
 	logging.info('Arguments %s', vars(command_line_args))
+
+	server = xmppServer(command_line_args.port)
+
+	server.run()
 
 	logging.info('SHUTDOWN')
 
