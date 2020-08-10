@@ -13,10 +13,10 @@ class xmppServer:
 
 	BUFFER_SIZE = 1024
 
-	def __init__(self, addr, port):
+	def __init__(self, bind_addr, bind_port):
 
-		self.addr = addr
-		self.port = port
+		self.bind_addr = bind_addr
+		self.bind_port = bind_port
 
 	def handler(self, client_conn, client_addr):
 
@@ -30,9 +30,19 @@ class xmppServer:
 
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-		s.bind((self.addr, self.port))
+		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # Avoids bind failures caused by old sockets in TIMED_WAIT state
 
-		logging.info('Server bound to %s:%d', self.addr, self.port)
+		try:
+
+			s.bind((self.bind_addr, self.bind_port))
+
+		except Exception as msg:
+
+			logging.info('Bind failed : %s', msg)
+
+			sys.exit()
+
+		logging.info('Server bound to %s:%d', self.bind_addr, self.bind_port)
 
 		s.listen(0) # don't allow unaccepted connections to be queued by the OS
 
