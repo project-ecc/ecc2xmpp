@@ -1,5 +1,6 @@
 import settings
 import argparse
+import pathlib
 import logging
 import socket
 import signal
@@ -11,12 +12,14 @@ from datetime import datetime
 
 class xmppServer:
 
-	BUFFER_SIZE = 1024
+	BUFFER_SIZE = 4096
 
 	def __init__(self, bind_addr, bind_port):
 
 		self.bind_addr = bind_addr
 		self.bind_port = bind_port
+
+	############################################################################
 
 	def handler(self, client_conn, client_addr):
 
@@ -25,6 +28,12 @@ class xmppServer:
 		data = client_conn.recv(self.BUFFER_SIZE)
 
 		logging.info(data)
+
+		data = client_conn.recv(self.BUFFER_SIZE)
+
+		logging.info(data)
+
+	############################################################################
 
 	def run(self):
 
@@ -44,7 +53,7 @@ class xmppServer:
 
 		logging.info('Server bound to %s:%d', self.bind_addr, self.bind_port)
 
-		s.listen(0) # don't allow unaccepted connections to be queued by the OS
+		s.listen(0) # 0 -> don't allow unaccepted connections to be queued by the OS
 
 		while True:
 
@@ -67,6 +76,8 @@ def terminate(signalNumber, frame):
 ################################################################################
 
 def main():
+
+	pathlib.Path('log').mkdir(parents=True, exist_ok=True)
 
 	logging.basicConfig(filename = 'log/{:%Y-%m-%d}.log'.format(datetime.now()),
 						filemode = 'a',
